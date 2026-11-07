@@ -1,0 +1,44 @@
+# Dependencies and generated output
+node_modules/
+dist/
+coverage/
+.dart_tool/
+.flutter-plugins-dependencies
+build/
+*.tsbuildinfo
+.pub-cache/
+.fvm/
+
+# Local environment and secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.jks
+*.keystore
+key.properties
+local.properties
+google-services.json
+GoogleService-Info.plist
+
+# Tool caches and personal state
+.idea/
+.DS_Store
+*.log
+.codex/
+.aws/
+*.iml
+
+# Native generated state
+**/Pods/
+**/.symlinks/
+**/Flutter/ephemeral/
+**/Flutter/Generated.xcconfig
+**/Flutter/flutter_export_environment.sh
+**/GeneratedPluginRegistrant.*
+**/xcuserdata/
+**/android/.gradle/
+**/android/captures/
+**/ios/Flutter/.last_build_id

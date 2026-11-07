@@ -1,0 +1,29 @@
+{
+  "name": "partybox",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Party games for Android and iOS — development workspace",
+  "engines": {
+    "node": ">=24 <25",
+    "npm": ">=11 <12"
+  },
+  "workspaces": [
+    "apps/backend",
+    "packages/game-contracts",
+    "packages/game-content"
+  ],
+  "scripts": {
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "test": "npm run test --workspaces --if-present",
+    "build": "npm run build --workspaces --if-present",
+    "check": "npm run format:check && npm run typecheck && npm test",
+    "dev:backend": "npm run dev --workspace @partybox/backend"
+  },
+  "devDependencies": {
+    "@types/node": "24.19.2",
+    "prettier": "3.9.10",
+    "typescript": "7.0.2"
+  }
+}

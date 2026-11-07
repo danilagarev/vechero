@@ -1,0 +1,29 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://partybox.invalid/schemas/content-pack.v1.json",
+  "title": "Spy content pack v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "id", "gameId", "locale", "version", "title", "items"],
+  "properties": {
+    "schemaVersion": { "const": 1 },
+    "id": { "type": "string", "pattern": "^[a-z][a-z0-9-]+$" },
+    "gameId": { "const": "spy" },
+    "locale": { "type": "string", "pattern": "^[a-z]{2}(-[A-Z]{2})?$" },
+    "version": { "type": "integer", "minimum": 1 },
+    "title": { "type": "string", "minLength": 1, "maxLength": 80 },
+    "items": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "label"],
+        "properties": {
+          "id": { "type": "string", "pattern": "^[a-z][a-z0-9-]+$" },
+          "label": { "type": "string", "minLength": 1, "maxLength": 80 }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,12 @@
+name: partybox_game_content
+description: Bundled, versioned content packs for PartyBox.
+version: 0.1.0
+publish_to: none
+environment:
+  sdk: '>=3.10.0 <4.0.0'
+dependencies:
+  flutter:
+    sdk: flutter
+flutter:
+  assets:
+    - packs/spy-ru-base.json

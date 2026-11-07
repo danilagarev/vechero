@@ -1,0 +1,19 @@
+name: partybox_mobile
+description: Party games for a group, on Android and iOS.
+version: 0.1.0+1
+publish_to: none
+environment:
+  sdk: '>=3.10.0 <4.0.0'
+dependencies:
+  flutter:
+    sdk: flutter
+  partybox_game_core:
+    path: ../../packages/game_core
+  partybox_game_content:
+    path: ../../packages/game-content
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+flutter:
+  uses-material-design: true

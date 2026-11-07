@@ -1,0 +1,18 @@
+{
+  "schemaVersion": 1,
+  "id": "spy-ru-base",
+  "gameId": "spy",
+  "locale": "ru",
+  "version": 1,
+  "title": "Знакомые места",
+  "items": [
+    { "id": "airport", "label": "Аэропорт" },
+    { "id": "library", "label": "Библиотека" },
+    { "id": "train", "label": "Поезд" },
+    { "id": "museum", "label": "Музей" },
+    { "id": "restaurant", "label": "Ресторан" },
+    { "id": "camp", "label": "Туристический лагерь" },
+    { "id": "theater", "label": "Театр" },
+    { "id": "space-station", "label": "Космическая станция" }
+  ]
+}
