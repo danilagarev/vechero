@@ -1,4 +1,4 @@
-.PHONY: bootstrap check check-mobile backend mobile
+.PHONY: bootstrap check check-mobile backend mobile preview-mobile gallery-mobile
 
 bootstrap:
 	npm ci
@@ -19,3 +19,10 @@ backend:
 
 mobile:
 	cd apps/mobile && flutter run
+
+preview-mobile:
+	cd apps/mobile && flutter build web --release --no-web-resources-cdn --pwa-strategy=none
+	python3 -m http.server 8716 --bind 127.0.0.1 --directory apps/mobile/build/web
+
+gallery-mobile:
+	cd apps/mobile && flutter run -d web-server --web-hostname 127.0.0.1 --web-port 8717 --dart-define=DESIGN_GALLERY=true

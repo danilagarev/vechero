@@ -1,16 +1,23 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:partybox_game_core/partybox_game_core.dart';
+
+import '../design/night_art.dart';
+import '../design/night_components.dart';
+import '../design/night_theme.dart';
+import '../design/night_result_art.dart';
 
 import 'local_session_adapter.dart';
 import 'spy_controller.dart';
 
 class SpyGameScreen extends StatefulWidget {
-  const SpyGameScreen({super.key, this.adapter, this.now});
+  const SpyGameScreen({super.key, this.adapter, this.now, this.loadPack});
 
   final LocalSessionAdapter? adapter;
   final DateTime Function()? now;
+  final Future<SpyPack> Function()? loadPack;
 
   @override
   State<SpyGameScreen> createState() => _SpyGameScreenState();
@@ -22,6 +29,8 @@ class _SpyGameScreenState extends State<SpyGameScreen>
   final _names = List.generate(12, (_) => TextEditingController());
   SpyController? _controller;
   Timer? _timer;
+  Timer? _handoffCooldown;
+  bool _canReveal = true;
   bool _loadFailed = false;
   bool _loading = false;
   bool _settings = false;
@@ -49,7 +58,8 @@ class _SpyGameScreenState extends State<SpyGameScreen>
     });
     try {
       final adapter =
-          widget.adapter ?? LocalSessionAdapter(pack: await SpyPack.load());
+          widget.adapter ??
+          LocalSessionAdapter(pack: await (widget.loadPack ?? SpyPack.load)());
       if (!mounted) return;
       final controller = SpyController(adapter: adapter, now: widget.now);
       controller.setForeground(
@@ -81,12 +91,28 @@ class _SpyGameScreenState extends State<SpyGameScreen>
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
     _timer?.cancel();
+    _handoffCooldown?.cancel();
     _controller?.removeListener(_refresh);
     _controller?.dispose();
     for (final name in _names) {
       name.dispose();
     }
     super.dispose();
+  }
+
+  void _handoff(String playerId) {
+    final controller = _controller!;
+    if (controller.currentPlayer?.id != playerId ||
+        controller.visibleCard == null) {
+      return;
+    }
+    // A second physical tap must not activate the next player's reveal button.
+    _handoffCooldown?.cancel();
+    _canReveal = false;
+    controller.handoff(playerId);
+    _handoffCooldown = Timer(const Duration(milliseconds: 500), () {
+      if (mounted) setState(() => _canReveal = true);
+    });
   }
 
   Future<void> _exit() async {
@@ -100,6 +126,7 @@ class _SpyGameScreenState extends State<SpyGameScreen>
     final leave = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
+        scrollable: true,
         title: const Text('Завершить партию?'),
         content: const Text('Текущая партия будет потеряна.'),
         actions: [
@@ -131,13 +158,13 @@ class _SpyGameScreenState extends State<SpyGameScreen>
     },
     child: Scaffold(
       appBar: AppBar(
-        title: const Text('Шпион'),
+        title: const Text('ШПИОН'),
         leading: BackButton(onPressed: _exit),
       ),
       body: SafeArea(
         child: Center(
           child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 640),
+            constraints: const BoxConstraints(maxWidth: 560),
             child: ListView(
               key: ValueKey((
                 _controller?.phase,
@@ -145,7 +172,20 @@ class _SpyGameScreenState extends State<SpyGameScreen>
                 _controller?.currentPlayer?.id,
               )),
               padding: const EdgeInsets.all(24),
-              children: _content(context),
+              children: [
+                NightEntrance(
+                  key: ValueKey((
+                    _controller?.phase,
+                    _settings,
+                    _controller?.currentPlayer?.id,
+                    _loadFailed,
+                  )),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: _content(context),
+                  ),
+                ),
+              ],
             ),
           ),
         ),
@@ -158,13 +198,24 @@ class _SpyGameScreenState extends State<SpyGameScreen>
     if (controller == null) {
       return [
         if (_loadFailed) ...[
+          const NightArt(kind: NightArtKind.constellation, height: 140),
+          _heading(context, 'Набор не загрузился'),
+          const SizedBox(height: 16),
           const Text('Не удалось загрузить набор. Попробуйте ещё раз.'),
+          const SizedBox(height: 24),
           FilledButton(
             onPressed: _load,
             child: const Text('Повторить загрузку'),
           ),
         ] else
-          const Center(child: CircularProgressIndicator()),
+          const Padding(
+            padding: EdgeInsets.all(48),
+            child: Center(
+              child: CircularProgressIndicator(
+                semanticsLabel: 'Загрузка локаций',
+              ),
+            ),
+          ),
       ];
     }
     switch (controller.phase) {
@@ -174,66 +225,145 @@ class _SpyGameScreenState extends State<SpyGameScreen>
         final player = controller.currentPlayer!;
         final card = controller.visibleCard;
         return [
+          NightEyebrow('ЛИЧНАЯ КАРТОЧКА / ТЕЛЕФОН ПО КРУГУ'),
+          const SizedBox(height: 12),
           Text(
             'Карточка ${controller.distributedCount + 1} из ${controller.players.length}',
+            style: const TextStyle(color: NightColors.muted),
+          ),
+          const SizedBox(height: 12),
+          LinearProgressIndicator(
+            value: controller.distributedCount / controller.players.length,
+            semanticsLabel:
+                'Роли получили ${controller.distributedCount} из ${controller.players.length}',
+            minHeight: 3,
+            borderRadius: BorderRadius.circular(2),
           ),
           const SizedBox(height: 24),
           _heading(context, 'Передайте телефон: ${player.name}'),
           const SizedBox(height: 24),
           if (card == null) ...[
-            const Text('Убедитесь, что только вы смотрите на экран.'),
+            const NightPanel(
+              child: Column(
+                children: [
+                  NightArt(kind: NightArtKind.seal, height: 150),
+                  Text(
+                    'Ваша роль под защитой',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.w800),
+                  ),
+                  SizedBox(height: 12),
+                  Text(
+                    'Убедитесь, что только вы смотрите на экран.',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(color: NightColors.muted),
+                  ),
+                ],
+              ),
+            ),
             const SizedBox(height: 24),
-            FilledButton(
+            NightButton(
               key: const ValueKey('reveal-role'),
-              onPressed: () => controller.reveal(player.id),
-              child: const Text('Показать мою роль'),
+              onPressed: !_canReveal
+                  ? null
+                  : () {
+                      if (_canReveal) controller.reveal(player.id);
+                    },
+              label: 'Показать мою роль',
             ),
           ] else ...[
-            Semantics(
-              liveRegion: true,
-              child: Card(
-                child: Padding(
-                  padding: const EdgeInsets.all(24),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      _heading(
-                        context,
-                        card.role == SpyRole.spy
-                            ? 'Вы — шпион'
-                            : 'Вы — мирный игрок',
-                      ),
-                      const SizedBox(height: 16),
-                      Text(
-                        card.location ??
-                            'Вы не знаете локацию. Слушайте вопросы и не выдавайте себя.',
-                      ),
-                    ],
+            NightEntrance(
+              key: ValueKey(('secret', player.id)),
+              child: Semantics(
+                liveRegion: true,
+                child: Card(
+                  child: Padding(
+                    padding: const EdgeInsets.all(24),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        NightArt(
+                          kind: card.role == SpyRole.spy
+                              ? NightArtKind.eye
+                              : NightArtKind.constellation,
+                          height: 150,
+                          onColor: NightColors.accent,
+                          color: card.role == SpyRole.spy
+                              ? NightColors.raised
+                              : NightColors.accent,
+                        ),
+                        const SizedBox(height: 16),
+                        Text(
+                          card.role == SpyRole.spy
+                              ? 'Вы — шпион'
+                              : 'Вы — мирный игрок',
+                          textAlign: TextAlign.center,
+                          style: Theme.of(context).textTheme.titleLarge
+                              ?.copyWith(color: NightColors.accent),
+                        ),
+                        const SizedBox(height: 16),
+                        Text(
+                          card.location ??
+                              'Вы не знаете локацию. Слушайте вопросы и не выдавайте себя.',
+                          textAlign: TextAlign.center,
+                          style: card.location == null
+                              ? Theme.of(context).textTheme.bodyLarge
+                              : Theme.of(context).textTheme.headlineLarge,
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
             ),
             const SizedBox(height: 24),
-            FilledButton(
+            NightButton(
               key: const ValueKey('handoff-role'),
-              onPressed: () => controller.handoff(player.id),
-              child: const Text('Скрыть и передать'),
+              onPressed: () => _handoff(player.id),
+              label: 'Скрыть и передать',
             ),
           ],
         ];
       case SpyPhase.discussion:
         final seconds = controller.remainingSeconds;
         return [
+          const NightEyebrow('ВСЕ РОЛИ РОЗДАНЫ'),
+          const SizedBox(height: 16),
           _heading(context, 'Обсуждение'),
+          const NightArt(kind: NightArtKind.constellation, height: 130),
           const SizedBox(height: 24),
           Semantics(
             label: 'Осталось ${seconds ~/ 60} минут ${seconds % 60} секунд',
             child: ExcludeSemantics(
-              child: Text(
-                '${seconds ~/ 60}:${(seconds % 60).toString().padLeft(2, '0')}',
-                key: const ValueKey('discussion-timer'),
-                style: Theme.of(context).textTheme.displayMedium,
+              child: FittedBox(
+                fit: BoxFit.scaleDown,
+                child: Text(
+                  '${seconds ~/ 60}:${(seconds % 60).toString().padLeft(2, '0')}',
+                  key: const ValueKey('discussion-timer'),
+                  style: const TextStyle(
+                    fontFamily: 'Manrope',
+                    fontSize: 80,
+                    height: 1.1,
+                    letterSpacing: -4,
+                    fontWeight: FontWeight.w800,
+                    color: NightColors.accent,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
               ),
+            ),
+          ),
+          const SizedBox(height: 16),
+          TweenAnimationBuilder<double>(
+            tween: Tween(end: seconds / (_minutes * 60)),
+            duration: NightMotion.reduced(context)
+                ? Duration.zero
+                : NightMotion.enter,
+            builder: (context, value, _) => LinearProgressIndicator(
+              value: value,
+              minHeight: 4,
+              borderRadius: BorderRadius.circular(4),
+              semanticsLabel: 'Оставшееся время обсуждения',
             ),
           ),
           const SizedBox(height: 24),
@@ -241,13 +371,15 @@ class _SpyGameScreenState extends State<SpyGameScreen>
             'Задавайте друг другу вопросы о месте. Не называйте локацию прямо.',
           ),
           const SizedBox(height: 24),
-          FilledButton(
+          NightButton(
             onPressed: controller.startVoting,
-            child: const Text('Завершить обсуждение'),
+            label: 'Завершить обсуждение',
           ),
         ];
       case SpyPhase.voting:
         return [
+          const NightEyebrow('ГОЛОСОВАНИЕ / ОБЩИЙ ВЫБОР'),
+          const SizedBox(height: 16),
           _heading(context, 'Кого подозревает компания?'),
           const SizedBox(height: 16),
           const Text(
@@ -256,24 +388,54 @@ class _SpyGameScreenState extends State<SpyGameScreen>
           const SizedBox(height: 16),
           RadioGroup<String>(
             groupValue: _suspectId,
-            onChanged: (value) => setState(() => _suspectId = value),
+            onChanged: (value) {
+              HapticFeedback.selectionClick();
+              setState(() => _suspectId = value);
+            },
             child: Column(
               children: [
                 for (var i = 0; i < controller.players.length; i++)
-                  RadioListTile<String>(
-                    title: Text(controller.players[i].name),
-                    subtitle: Text('Игрок ${i + 1}'),
-                    value: controller.players[i].id,
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 10),
+                    child: Material(
+                      animationDuration: NightMotion.reduced(context)
+                          ? Duration.zero
+                          : NightMotion.quick,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(18),
+                        side: BorderSide(
+                          color: _suspectId == controller.players[i].id
+                              ? NightColors.accent
+                              : NightColors.border,
+                        ),
+                      ),
+                      color: _suspectId == controller.players[i].id
+                          ? NightColors.raised
+                          : NightColors.surface,
+                      child: RadioListTile<String>(
+                        selected: _suspectId == controller.players[i].id,
+                        title: Text(controller.players[i].name),
+                        subtitle: Text('Игрок ${i + 1}'),
+                        value: controller.players[i].id,
+                      ),
+                    ),
                   ),
               ],
             ),
           ),
           const SizedBox(height: 24),
-          FilledButton(
+          if (_suspectId != null) ...[
+            Text(
+              'Выбор компании: ${controller.players.firstWhere((p) => p.id == _suspectId).name}',
+              style: const TextStyle(color: NightColors.accent),
+            ),
+            const SizedBox(height: 16),
+          ],
+          NightButton(
             onPressed: _suspectId == null
                 ? null
                 : () => controller.accuse(_suspectId!),
-            child: const Text('Подтвердить и раскрыть'),
+            label: 'Подтвердить и раскрыть',
           ),
         ];
       case SpyPhase.results:
@@ -285,6 +447,17 @@ class _SpyGameScreenState extends State<SpyGameScreen>
           (p) => p.id == result['suspectId'],
         );
         return [
+          const NightEyebrow('ИТОГ ПАРТИИ'),
+          NightResultArt(
+            kind: result['winner'] == 'civilians'
+                ? NightArtKind.seal
+                : NightArtKind.eye,
+            height: 180,
+            onColor: NightColors.accent,
+            color: result['winner'] == 'civilians'
+                ? NightColors.accent
+                : NightColors.raised,
+          ),
           _heading(
             context,
             result['winner'] == 'civilians'
@@ -292,16 +465,35 @@ class _SpyGameScreenState extends State<SpyGameScreen>
                 : 'Шпион победил!',
           ),
           const SizedBox(height: 24),
-          Text('Шпион: ${spy.name}'),
-          Text('Локация: ${result['location']}'),
-          Text('Вы выбрали: ${suspect.name}'),
+          Text(
+            result['winner'] == 'civilians'
+                ? 'Алиби не сработало. Команда верно вычислила шпиона.'
+                : 'Шпион остался незамеченным. Компания выбрала мирного игрока.',
+            style: const TextStyle(color: NightColors.muted),
+          ),
           const SizedBox(height: 24),
-          FilledButton(
+          NightPanel(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Text(
+                  'Шпион: ${spy.name}',
+                  style: const TextStyle(fontWeight: FontWeight.w800),
+                ),
+                const Divider(height: 28),
+                Text('Локация: ${result['location']}'),
+                const Divider(height: 28),
+                Text('Вы выбрали: ${suspect.name}'),
+              ],
+            ),
+          ),
+          const SizedBox(height: 24),
+          NightButton(
             onPressed: () {
               _suspectId = null;
               controller.replay();
             },
-            child: const Text('Ещё раз с теми же игроками'),
+            label: 'Ещё раз с теми же игроками',
           ),
           TextButton(
             onPressed: () =>
@@ -316,6 +508,8 @@ class _SpyGameScreenState extends State<SpyGameScreen>
       Text(text, style: Theme.of(context).textTheme.headlineMedium);
 
   List<Widget> _playersContent() => [
+    const NightEyebrow('ПОДГОТОВКА / 01'),
+    const SizedBox(height: 16),
     _heading(context, 'Кто играет?'),
     const SizedBox(height: 16),
     const Text('От 4 до 12 человек. Одинаковые имена допустимы.'),
@@ -355,19 +549,26 @@ class _SpyGameScreenState extends State<SpyGameScreen>
         ],
       ),
     ),
-    FilledButton(
+    NightButton(
       onPressed: () {
         if (!_formKey.currentState!.validate()) return;
         FocusManager.instance.primaryFocus?.unfocus();
         setState(() => _settings = true);
       },
-      child: const Text('К настройкам'),
+      label: 'К настройкам',
     ),
     TextButton(onPressed: _exit, child: const Text('Отменить подготовку')),
   ];
 
   List<Widget> _settingsContent(SpyController controller) => [
+    const NightEyebrow('ПОДГОТОВКА / 02'),
+    const SizedBox(height: 16),
     _heading(context, 'Настройки партии'),
+    const SizedBox(height: 12),
+    const Text(
+      'Один раунд. Один шпион. Все свои?',
+      style: TextStyle(color: NightColors.muted),
+    ),
     const SizedBox(height: 24),
     DropdownButtonFormField<String>(
       isExpanded: true,
@@ -396,11 +597,11 @@ class _SpyGameScreenState extends State<SpyGameScreen>
     const SizedBox(height: 24),
     Text('Игроков: $_count · один шпион'),
     const SizedBox(height: 24),
-    FilledButton(
+    NightButton(
       onPressed: () => controller.start([
         for (final name in _names.take(_count)) name.text,
       ], Duration(minutes: _minutes)),
-      child: const Text('Раздать роли'),
+      label: 'Раздать роли',
     ),
     TextButton(
       onPressed: () => setState(() => _settings = false),

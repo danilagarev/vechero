@@ -3,14 +3,16 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:partybox_game_content/partybox_game_content.dart';
 import 'package:partybox_mobile/src/app.dart';
 
+import 'support/local_game_flow.dart';
+
 void main() {
   testWidgets('catalog opens rules and can return', (tester) async {
     await tester.pumpWidget(const PartyBoxApp());
     expect(find.text('Шпион'), findsOneWidget);
-    await tester.tap(find.text('Как играть'));
+    await tapVisible(tester, find.text('Как играть'));
     await tester.pumpAndSettle();
     expect(find.text('Один из вас не в курсе.'), findsOneWidget);
-    await tester.pageBack();
+    await goBack(tester);
     await tester.pumpAndSettle();
     expect(find.text('Как играть'), findsOneWidget);
   });
@@ -25,7 +27,7 @@ void main() {
     await tester.pumpWidget(const PartyBoxApp());
     await tester.scrollUntilVisible(find.text('Как играть'), 200);
     await tester.pumpAndSettle();
-    await tester.tap(find.text('Как играть'));
+    await tapVisible(tester, find.text('Как играть'));
     await tester.pumpAndSettle();
     expect(find.text('Один из вас не в курсе.'), findsOneWidget);
     expect(tester.takeException(), isNull);

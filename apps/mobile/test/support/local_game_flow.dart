@@ -27,6 +27,24 @@ Future<void> tapVisible(
   bool loadsContent = false,
 }) async {
   await showWidget(tester, finder);
+  // Wait for deliberately disabled controls (e.g. the handoff tap guard).
+  final buttons = find.ancestor(
+    of: finder,
+    matching: find.byType(FilledButton),
+  );
+  final nestedButtons = find.descendant(
+    of: finder,
+    matching: find.byType(FilledButton),
+  );
+  for (var attempt = 0; attempt < 12; attempt++) {
+    final widgets = [
+      ...buttons.evaluate(),
+      ...nestedButtons.evaluate(),
+      ...finder.evaluate(),
+    ].map((e) => e.widget).whereType<FilledButton>();
+    if (!widgets.any((button) => button.onPressed == null)) break;
+    await tester.pump(const Duration(milliseconds: 50));
+  }
   await tester.tap(finder);
   if (loadsContent) {
     await tester.pump();
@@ -45,6 +63,9 @@ Future<void> tapVisible(
   }
   await tester.pumpAndSettle();
 }
+
+Future<void> goBack(WidgetTester tester) =>
+    tapVisible(tester, find.byType(BackButton).last);
 
 Future<void> prepareGame(WidgetTester tester) async {
   rootBundle.clear();
@@ -96,10 +117,10 @@ Future<void> playLocalGame(WidgetTester tester) async {
   expect(find.text('Карточка 1 из 4'), findsOneWidget);
   expect(find.textContaining('Локация: '), findsNothing);
   // Dispose the periodic timer in widget runs and leave the device at the catalog.
-  await tester.pageBack();
+  await goBack(tester);
   await tester.pumpAndSettle();
   await tapVisible(tester, find.text('Завершить'));
-  await tester.pageBack();
+  await goBack(tester);
   await tester.pumpAndSettle();
   expect(find.text('Как играть'), findsOneWidget);
 }

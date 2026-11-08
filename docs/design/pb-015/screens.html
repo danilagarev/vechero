@@ -1,0 +1,183 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <link rel="icon" href="data:," />
+    <title>Вечеро — экраны Flutter PB-015</title>
+    <style>
+      body {
+        margin: 0;
+        padding: 32px;
+        background: #e7e5e0;
+        color: #182323;
+        font:
+          16px/1.6 Arial,
+          sans-serif;
+      }
+      main {
+        max-width: 1280px;
+        margin: auto;
+      }
+      h1 {
+        font-size: 36px;
+        letter-spacing: -1px;
+      }
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 24px;
+      }
+      figure {
+        margin: 0;
+      }
+      img {
+        width: 100%;
+        border-radius: 16px;
+        border: 1px solid #66806d;
+      }
+      figcaption {
+        padding: 8px 0;
+        font-size: 14px;
+      }
+      a {
+        color: inherit;
+      }
+      p {
+        max-width: 750px;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>«Полночный клуб» во Flutter</h1>
+      <p>
+        Реальные виджеты, локальные шрифты, фиксированные время и случайность. Только вымышленные
+        участники. Снимки служат golden-эталонами. Длинные экраны прокручиваются в приложении; здесь
+        показан исходный viewport 360×800.
+      </p>
+      <p>
+        <a href="http://localhost:8716/">Запустить игру в локальном превью</a> ·
+        <a href="directions.html">Исходные направления</a>
+      </p>
+      <div class="grid">
+        <figure>
+          <a href="after-catalog.png"
+            ><img src="after-catalog.png" alt="Каталог: Flutter, 360 на 800" loading="lazy"
+          /></a>
+          <figcaption>01 / Каталог</figcaption>
+        </figure>
+        <figure>
+          <a href="after-rules.png"
+            ><img src="after-rules.png" alt="Правила: Flutter, 360 на 800" loading="lazy"
+          /></a>
+          <figcaption>02 / Правила</figcaption>
+        </figure>
+        <figure>
+          <a href="after-players.png"
+            ><img src="after-players.png" alt="Состав: Flutter, 360 на 800" loading="lazy"
+          /></a>
+          <figcaption>03 / Состав</figcaption>
+        </figure>
+        <figure>
+          <a href="after-settings.png"
+            ><img src="after-settings.png" alt="Настройки: Flutter, 360 на 800" loading="lazy"
+          /></a>
+          <figcaption>04 / Настройки</figcaption>
+        </figure>
+        <figure>
+          <a href="after-handoff.png"
+            ><img src="after-handoff.png" alt="Передача: Flutter, 360 на 800" loading="lazy"
+          /></a>
+          <figcaption>05 / Передача</figcaption>
+        </figure>
+        <figure>
+          <a href="after-civilian.png"
+            ><img src="after-civilian.png" alt="Мирный игрок: Flutter, 360 на 800" loading="lazy"
+          /></a>
+          <figcaption>06 / Мирный игрок</figcaption>
+        </figure>
+        <figure>
+          <a href="after-spy.png"
+            ><img src="after-spy.png" alt="Шпион: Flutter, 360 на 800" loading="lazy"
+          /></a>
+          <figcaption>07 / Шпион</figcaption>
+        </figure>
+        <figure>
+          <a href="after-discussion.png"
+            ><img src="after-discussion.png" alt="Обсуждение: Flutter, 360 на 800" loading="lazy"
+          /></a>
+          <figcaption>08 / Обсуждение</figcaption>
+        </figure>
+        <figure>
+          <a href="after-voting.png"
+            ><img src="after-voting.png" alt="Голосование: Flutter, 360 на 800" loading="lazy"
+          /></a>
+          <figcaption>09 / Голосование</figcaption>
+        </figure>
+        <figure>
+          <a href="after-result-team.png"
+            ><img
+              src="after-result-team.png"
+              alt="Победа команды: Flutter, 360 на 800"
+              loading="lazy"
+          /></a>
+          <figcaption>10 / Победа команды</figcaption>
+        </figure>
+        <figure>
+          <a href="after-result-spy.png"
+            ><img
+              src="after-result-spy.png"
+              alt="Победа шпиона: Flutter, 360 на 800"
+              loading="lazy"
+          /></a>
+          <figcaption>11 / Победа шпиона</figcaption>
+        </figure>
+        <figure>
+          <a href="after-loading.png"
+            ><img src="after-loading.png" alt="Загрузка: Flutter, 360 на 800" loading="lazy"
+          /></a>
+          <figcaption>12 / Загрузка</figcaption>
+        </figure>
+        <figure>
+          <a href="after-error.png"
+            ><img src="after-error.png" alt="Ошибка: Flutter, 360 на 800" loading="lazy"
+          /></a>
+          <figcaption>13 / Ошибка</figcaption>
+        </figure>
+      </div>
+      <h2>Дополнительные состояния</h2>
+      <div class="grid">
+        <figure>
+          <img src="after-voting-selected.png" alt="Выбранный подозреваемый" />
+          <figcaption>Выбранный подозреваемый</figcaption>
+        </figure>
+        <figure>
+          <img src="after-exit.png" alt="Подтверждение выхода: роль скрыта" />
+          <figcaption>Подтверждение выхода: роль скрыта</figcaption>
+        </figure>
+      </div>
+      <h2>Движение</h2>
+      <p><a href="normal.webm">Обычные переходы</a> · <a href="reduced.webm">Reduced motion</a></p>
+      <h2>До переработки</h2>
+      <div class="grid">
+        <figure>
+          <img src="before-catalog.png" alt="До PB-015: Каталог" />
+          <figcaption>Каталог</figcaption>
+        </figure>
+        <figure>
+          <img src="before-handoff.png" alt="До PB-015: Передача" />
+          <figcaption>Передача</figcaption>
+        </figure>
+        <figure>
+          <img src="before-role.png" alt="До PB-015: Роль" />
+          <figcaption>Роль</figcaption>
+        </figure>
+        <figure>
+          <img src="before-result.png" alt="До PB-015: Результат" />
+          <figcaption>Результат</figcaption>
+        </figure>
+      </div>
+    </main>
+  </body>
+</html>

@@ -46,3 +46,6 @@ GoogleService-Info.plist
 # Local browser inspection artifacts; selected captures live in docs/design
 .playwright-cli/
 output/playwright/
+
+# Flutter visual regression diagnostics
+apps/mobile/test/failures/

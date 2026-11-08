@@ -88,7 +88,7 @@ void main() {
     expect(find.text('Карточка 2 из 4'), findsOneWidget);
     expect(find.byType(Card), findsNothing);
     await tapVisible(tester, find.text('Показать мою роль'));
-    await tester.pageBack();
+    await goBack(tester);
     await tester.pumpAndSettle();
     await tapVisible(tester, find.text('Продолжить игру'));
     expect(find.text('Карточка 2 из 4'), findsOneWidget);
@@ -101,7 +101,7 @@ void main() {
   ) async {
     // Navigate without entering any names.
     await prepareGame(tester);
-    await tester.pageBack();
+    await goBack(tester);
     await tester.pumpAndSettle();
     await tapVisible(tester, find.text('Завершить'));
     await tapVisible(tester, find.text('Собрать компанию'), loadsContent: true);

@@ -1,33 +1,21 @@
-// Opt-in PB-015 source captures, not visual regression baselines.
+// Opt-in scratch captures. Historical PB-010 images are kept unchanged.
 // flutter test tool/design_baseline_test.dart --update-goldens
 import 'dart:math';
-import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:partybox_mobile/src/app.dart';
 import 'package:partybox_mobile/src/spy/local_session_adapter.dart';
 import 'package:partybox_mobile/src/spy/spy_game_screen.dart';
 
 import '../test/support/local_game_flow.dart';
+import '../test/support/design_fonts.dart';
 
 void main() {
-  testWidgets('capture PB-010 before visual redesign', (tester) async {
-    // Widget tests use Ahem by default. Supply a local Cyrillic font explicitly.
-    final fontPath = Platform.environment['PB_DESIGN_FONT'];
-    if (fontPath == null) {
-      throw StateError('Set PB_DESIGN_FONT to a local Cyrillic TTF font.');
-    }
-    await tester.runAsync(() async {
-      final bytes = await File(fontPath).readAsBytes();
-      await (FontLoader(
-        'Roboto',
-      )..addFont(Future.value(ByteData.sublistView(bytes)))).load();
-      await (FontLoader(
-        'MaterialIcons',
-      )..addFont(rootBundle.load('fonts/MaterialIcons-Regular.otf'))).load();
-    });
+  testWidgets('capture current UI to scratch for visual inspection', (
+    tester,
+  ) async {
+    await loadDesignFonts(tester);
     tester.view.physicalSize = const Size(360, 800);
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.resetPhysicalSize);
@@ -40,7 +28,7 @@ void main() {
     Future<void> capture(String name) async {
       await expectLater(
         find.byKey(boundary),
-        matchesGoldenFile('../../../docs/design/pb-015/before-$name.png'),
+        matchesGoldenFile('../../../output/playwright/current-$name.png'),
       );
     }
 

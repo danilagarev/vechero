@@ -93,6 +93,21 @@ flutter test integration_test/local_game_test.dart -d <device-id>
 выбранного времени и проверить переход к выбору подозреваемого. Проверить также
 системный «Назад»: во время партии нужен диалог, отмена оставляет роль закрытой.
 
+## Превью выбранного дизайна PB-015
+
+```sh
+make preview-mobile
+```
+
+Открыть http://localhost:8716. Это настоящий локальный игровой цикл Flutter
+в web host; сервер игры не требуется. Сборка использует локальные fonts/CanvasKit
+и отключает service worker, чтобы изменения не скрывались кешем старой версии.
+Если ранее запускали старое web-превью с service worker, один раз удалить данные
+именно этого localhost origin в браузере или открыть приватное окно.
+Для галереи компонентов в non-release режиме: `make gallery-mobile`, порт 8717.
+Команды требуют Python 3 и Flutter в PATH. Сборка для web не заменяет Android/iOS.
+Подробности: [DESIGN_SYSTEM](DESIGN_SYSTEM.md), [снимки и проверки](design/pb-015/verification.md).
+
 ## Нативные проекты
 
 Android/iOS host-проекты сгенерированы Flutter 3.38.5. Временный namespace/bundle ID
