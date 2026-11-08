@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'spy/spy_game_screen.dart';
+
 class PartyBoxApp extends StatelessWidget {
   const PartyBoxApp({super.key});
 
@@ -123,6 +125,13 @@ class SpyRulesScreen extends StatelessWidget {
             const Text(
               'Когда время закончится, обсудите подозрения и выберите одного '
               'игрока. Угадали шпиона — победила команда. Ошиблись — победил шпион.',
+            ),
+            const SizedBox(height: 24),
+            FilledButton(
+              onPressed: () => Navigator.of(context).push<void>(
+                MaterialPageRoute(builder: (_) => const SpyGameScreen()),
+              ),
+              child: const Text('Собрать компанию'),
             ),
           ],
         ),

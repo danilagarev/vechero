@@ -35,7 +35,7 @@ make check
 
 ```sh
 npm run format
-dart format packages/game_core packages/game-content/lib apps/mobile/lib apps/mobile/test
+dart format packages/game_core packages/game-content/lib apps/mobile/lib apps/mobile/test apps/mobile/integration_test
 ```
 
 Prettier не форматирует generated native-файлы и Dart. Для Dart используется
@@ -64,11 +64,34 @@ flutter devices
 make mobile
 ```
 
-Сейчас доступны каталог и правила. Партия из ядра ещё не подключена к экранным
-сценариям: это PB-010. `packages/game-content` одновременно является npm workspace
+Доступен полный локальный цикл «Шпиона», включая повтор с прежними именами.
+Настройки и активная партия живут в памяти: после закрытия приложения они теряются.
+`packages/game-content` одновременно является npm workspace
 для валидации и Flutter-пакетом `partybox_game_content` для доставки assets.
 Мобильный клиент использует ключ `packages/partybox_game_content/packs/spy-ru-base.json`;
 widget-тест проверяет asset manifest и чтение JSON. Не создавайте вторую ручную копию контента.
+
+## Проверка локальной партии
+
+`make check-mobile` запускает анализ, тесты ядра и widget-тесты. Они покрывают полный
+цикл, повтор, передачу, двойное нажатие, скрытие роли в фоне, восстановление deadline,
+отмену подготовки и экран 320×640 с масштабом текста 2.
+
+Integration-тест использует тот же полный пользовательский сценарий с реальным
+встроенным набором. На подключённом Android/iOS-устройстве или эмуляторе:
+
+```sh
+cd apps/mobile
+flutter devices
+flutter test integration_test/local_game_test.dart -d <device-id>
+```
+
+Этот запуск выполняется отдельно от `make check-mobile`: нужен платформенный SDK
+и устройство. CI пока запускает только ядро/widget-тесты. Для ручной приёмки:
+четыре человека проходят цикл без интернета; при открытой роли свернуть приложение,
+вернуться и убедиться, что карточка закрыта; во время обсуждения уйти в фон дольше
+выбранного времени и проверить переход к выбору подозреваемого. Проверить также
+системный «Назад»: во время партии нужен диалог, отмена оставляет роль закрытой.
 
 ## Нативные проекты
 
