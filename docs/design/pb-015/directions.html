@@ -1,0 +1,590 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" href="data:," />
+    <title>Вечеро · три направления PB-015</title>
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        background: #e7e5e0;
+        color: #242424;
+        font-family: Arial, sans-serif;
+      }
+      main {
+        max-width: 1260px;
+        margin: auto;
+        padding: 48px 24px;
+      }
+      header {
+        display: flex;
+        justify-content: space-between;
+        align-items: start;
+        gap: 24px;
+      }
+      h1 {
+        font-size: clamp(30px, 5vw, 56px);
+        letter-spacing: -2px;
+        margin: 12px 0 20px;
+      }
+      header p {
+        max-width: 520px;
+        line-height: 1.6;
+      }
+      small,
+      .eyebrow {
+        font-size: 11px;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+      }
+      nav {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        margin: 24px 0 48px;
+      }
+      button,
+      a {
+        touch-action: manipulation;
+      }
+      nav a {
+        padding: 14px 20px;
+        border: 1px solid #777;
+        border-radius: 30px;
+        color: inherit;
+        text-decoration: none;
+      }
+      a:focus-visible,
+      button:focus-visible {
+        outline: 3px solid #4589ff;
+        outline-offset: 4px;
+      }
+      section {
+        scroll-margin-top: 24px;
+        margin-bottom: 64px;
+      }
+      h2 {
+        font-size: 28px;
+        letter-spacing: -0.8px;
+        margin-bottom: 8px;
+      }
+      .description {
+        line-height: 1.6;
+        max-width: 780px;
+      }
+      .screens {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 24px;
+        margin-top: 24px;
+      }
+      .specimen {
+        min-width: 0;
+      }
+      .caption {
+        font-size: 12px;
+        margin: 12px 4px;
+        color: #555;
+      }
+      .phone {
+        position: relative;
+        min-height: 744px;
+        padding: 26px;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+      }
+      .phone p {
+        line-height: 1.5;
+      }
+      .phone h3 {
+        font-size: 42px;
+        line-height: 1.04;
+        letter-spacing: -1.8px;
+        margin: 26px 0 16px;
+        overflow-wrap: anywhere;
+      }
+      .phone h4 {
+        font-size: 32px;
+        line-height: 1.08;
+        margin: 14px 0;
+        letter-spacing: -1px;
+      }
+      .top {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 11px;
+        letter-spacing: 2px;
+        gap: 8px;
+      }
+      .subtitle {
+        font-size: 15px;
+      }
+      .meta {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        margin: 16px 0;
+      }
+      .pill {
+        font-size: 11px;
+        padding: 8px 10px;
+        border: 1px solid currentColor;
+        border-radius: 20px;
+      }
+      .cta {
+        display: block;
+        width: 100%;
+        padding: 17px 12px;
+        min-height: 54px;
+        border: 0;
+        font-size: 15px;
+        font-weight: 700;
+        cursor: pointer;
+        white-space: normal;
+      }
+      .foot {
+        margin-top: auto;
+        padding-top: 24px;
+      }
+      .foot p {
+        font-size: 12px;
+        margin-bottom: 0;
+      }
+      .art {
+        height: 200px;
+        position: relative;
+        display: grid;
+        place-items: center;
+        flex-shrink: 0;
+      }
+      .art svg {
+        width: 100%;
+        height: 100%;
+        overflow: visible;
+      }
+      .role {
+        padding: 28px 20px;
+        margin-top: 24px;
+        text-align: center;
+        min-height: 340px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        gap: 14px;
+      }
+      .role p {
+        margin: 0;
+      }
+      .symbol {
+        font-size: 56px;
+        line-height: 1.2;
+      }
+      .secret {
+        min-height: 148px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+      }
+      .secret strong {
+        font-size: 30px;
+        line-height: 1.2;
+      }
+      .result-details {
+        display: grid;
+        gap: 0;
+        margin: 24px 0;
+      }
+      .result-details div {
+        display: flex;
+        justify-content: space-between;
+        gap: 16px;
+        padding: 14px 0;
+        border-top: 1px solid currentColor;
+        font-size: 13px;
+      }
+      .result-details dd {
+        margin: 0;
+        text-align: right;
+      }
+      .result-details dt {
+        opacity: 0.8;
+      }
+      .night .phone {
+        color: #f3efe7;
+        background: #141b1c;
+        border-radius: 30px;
+      }
+      .night .game {
+        background: #b7e77c;
+        color: #182323;
+        border-radius: 22px;
+        padding: 22px;
+        margin-top: 16px;
+      }
+      .night .game h4 {
+        font-size: 48px;
+      }
+      .night .cta {
+        background: #b7e77c;
+        color: #182323;
+        border-radius: 16px;
+      }
+      .night .game .cta {
+        background: #182323;
+        color: #f3efe7;
+      }
+      .night .role {
+        background: #202c2a;
+        border: 1px solid #55715d;
+        border-radius: 24px;
+      }
+      .night .symbol {
+        color: #b7e77c;
+      }
+      .night .result-art {
+        border-radius: 50%;
+        border: 1px solid #8cae6b;
+        margin: 32px auto 8px;
+        width: 180px;
+        height: 180px;
+      }
+      .night .result-art span {
+        font-size: 90px;
+        color: #b7e77c;
+      }
+      .night h3 em {
+        color: #b7e77c;
+        font-style: normal;
+      }
+      .paper .phone {
+        background: #f4eddc;
+        color: #302b27;
+        border: 1px solid #b8ae9b;
+        border-radius: 6px;
+      }
+      .paper .top {
+        border-bottom: 2px solid #302b27;
+        padding-bottom: 18px;
+      }
+      .paper h3,
+      .paper h4 {
+        font-family: Georgia, serif;
+        font-weight: 400;
+        letter-spacing: -1px;
+      }
+      .paper .game {
+        border: 1px solid #302b27;
+        padding: 20px;
+        box-shadow: 5px 5px 0 #d3c8b2;
+        margin-top: 20px;
+      }
+      .paper .art {
+        height: 180px;
+        background: repeating-linear-gradient(0deg, transparent, transparent 24px, #d8cdb7 25px);
+      }
+      .paper .cta {
+        background: #a53625;
+        color: #fff7e5;
+        border-radius: 3px;
+      }
+      .paper .role {
+        border: 1px solid #302b27;
+        outline: 1px solid #b9ad96;
+        outline-offset: -7px;
+        background: #e9dfca;
+      }
+      .paper .symbol {
+        color: #a53625;
+      }
+      .paper .stamp {
+        font:
+          700 24px Arial,
+          sans-serif;
+        transform: rotate(-9deg);
+        border: 3px double #a53625;
+        color: #a53625;
+        padding: 20px 8px;
+        letter-spacing: 3px;
+        margin: 40px 0 28px;
+        text-align: center;
+      }
+      .poster .phone {
+        background: #5739bf;
+        color: #fff6d9;
+        border-radius: 12px;
+      }
+      .poster .top {
+        font-weight: 700;
+      }
+      .poster h3,
+      .poster h4 {
+        font-weight: 900;
+        letter-spacing: -2px;
+      }
+      .poster h3 {
+        font-size: 48px;
+      }
+      .poster .game {
+        background: #ffbece;
+        color: #2a2054;
+        padding: 22px;
+        border-radius: 60px 12px 12px 12px;
+        margin-top: 20px;
+      }
+      .poster .game h4 {
+        font-size: 52px;
+      }
+      .poster .cta {
+        color: #2a2054;
+        background: #f6eb75;
+        border-radius: 100px;
+      }
+      .poster .game .cta {
+        color: #fff6d9;
+        background: #2a2054;
+      }
+      .poster .role {
+        background: #f6eb75;
+        color: #2a2054;
+        border-radius: 70px 14px 70px 14px;
+      }
+      .poster .result-art {
+        background: #f6eb75;
+        color: #2a2054;
+        clip-path: polygon(
+          50% 0,
+          61% 18%,
+          83% 5%,
+          82% 30%,
+          100% 38%,
+          84% 53%,
+          97% 78%,
+          72% 78%,
+          64% 100%,
+          47% 83%,
+          25% 100%,
+          25% 76%,
+          0 68%,
+          17% 49%,
+          0 27%,
+          28% 27%,
+          34% 4%
+        );
+        height: 200px;
+        margin-top: 22px;
+      }
+      .poster .result-art span {
+        font-size: 90px;
+      }
+      .motion-note {
+        font-size: 13px;
+        line-height: 1.6;
+        margin: 20px 0;
+      }
+      .phone .cta:hover {
+        filter: brightness(1.08);
+      }
+      .phone .cta:active {
+        transform: translateY(2px);
+      }
+      .notice {
+        border-top: 1px solid #aaa;
+        padding-top: 24px;
+        font-size: 14px;
+        line-height: 1.7;
+      }
+      .selected {
+        font-size: 12px;
+        border: 1px solid #555;
+        padding: 7px 10px;
+        border-radius: 20px;
+        display: inline-block;
+      }
+      .result-art {
+        display: grid;
+        place-items: center;
+      }
+      .role.revealed .symbol {
+        opacity: 0.6;
+      }
+      .revealed .secret {
+        animation: enter 0.18s ease-out;
+      }
+      @keyframes enter {
+        from {
+          opacity: 0;
+          transform: translateY(6px);
+        }
+        to {
+          opacity: 1;
+          transform: none;
+        }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        *,
+        *::before,
+        *::after {
+          animation: none !important;
+          transition: none !important;
+          transform: none !important;
+        }
+      }
+      @media (max-width: 900px) {
+        .screens {
+          grid-template-columns: repeat(3, 360px);
+          overflow-x: auto;
+          padding-bottom: 16px;
+        }
+        .phone {
+          min-height: 744px;
+        }
+        header {
+          display: block;
+        }
+      }
+      @media (max-width: 430px) {
+        main {
+          padding: 24px 12px;
+        }
+        .screens {
+          grid-template-columns: repeat(3, minmax(0, 1fr));
+          display: flex;
+          flex-direction: column;
+          overflow: visible;
+        }
+        .phone {
+          width: 100%;
+          min-height: 720px;
+        }
+        nav a {
+          padding: 12px;
+        }
+        header small {
+          letter-spacing: 1px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <header>
+        <div>
+          <small>ВЕЧЕРО / ДИЗАЙН-ЛАБОРАТОРИЯ / 01</small>
+          <h1>Как звучит наш вечер?</h1>
+        </div>
+        <p>
+          Три направления для одной игры. Каталог, личная карточка и результат в каждом. Это
+          интерактивные эскизы: кнопки карточек показывают принцип передачи, остальные ведут к
+          соседнему экрану. Полная партия работает во Flutter.
+        </p>
+      </header>
+      <nav aria-label="Визуальные направления">
+        <a href="#night">01 · Полночный клуб</a><a href="#paper">02 · Бумажное дело</a
+        ><a href="#poster">03 · Игровая афиша</a>
+      </nav>
+      <div id="directions"></div>
+      <p class="notice">
+        Все имена и роли здесь вымышленные. Иллюстрации — собственная векторная графика в исходнике;
+        внешних assets, шрифтовых загрузок и сетевых зависимостей нет. Шрифты пока системные: Arial
+        / Georgia с кириллицей. Финальная гарнитура и проверка на устройствах — на следующем шаге.
+      </p>
+    </main>
+    <script>
+      const concepts = [
+        {
+          id: 'night',
+          name: 'Полночный клуб',
+          tag: 'Рабочее направление',
+          desc: 'Спокойная тёмная сцена, светящаяся зелёная карточка и знак взгляда. Крупная типографика, простор и мягкие формы. Самая близкая к исходному премиальному направлению гипотеза.',
+          heading: 'Хороший вечер.<br><em>Плохое алиби.</em>',
+          motion:
+            'Движение: появление поверхности за 180 мс, небольшой подъём карточки. Передача и скрытие секрета — мгновенно.',
+          result: 'Алиби<br>не сработало.',
+        },
+        {
+          id: 'paper',
+          name: 'Бумажное дело',
+          tag: 'Светлая альтернатива',
+          desc: 'Личное досье: бумажные поля, наборная антиква, тонкие линии и красная печать. Более камерная, тактильная атмосфера настольной игры. Светлая композиция требует проверки вечером.',
+          heading: 'За столом<br>есть тайна.',
+          motion:
+            'Движение: короткий сдвиг листа за 160 мс. Результат появляется как печать. Секрет исчезает без анимации.',
+          result: 'Дело<br>раскрыто.',
+        },
+        {
+          id: 'poster',
+          name: 'Игровая афиша',
+          tag: 'Энергичная альтернатива',
+          desc: 'Фиолетовая афиша, лимонные знаки и розовые игровые блоки. Жирные заголовки и асимметрия превращают телефон в приглашение играть. Характер веселее и громче, чем у двух других.',
+          heading: 'Все свои.<br>Почти.',
+          motion:
+            'Движение: упругий отклик за 220 мс только на публичных элементах. Reduced motion отключает сдвиг и масштаб.',
+          result: 'Попался!<br>Вот это вечер.',
+        },
+      ];
+      function art(id) {
+        if (id === 'night')
+          return `<svg viewBox="0 0 280 200" role="img" aria-label="Взгляд в темноте"><circle cx="140" cy="100" r="87" fill="none" stroke="currentColor" opacity=".2"/><circle cx="140" cy="100" r="65" fill="none" stroke="currentColor" opacity=".2"/><path d="M30 100Q140 -10 250 100Q140 210 30 100Z" fill="#182323"/><circle cx="140" cy="100" r="38" fill="#b7e77c"/><circle cx="140" cy="100" r="19" fill="#182323"/><circle cx="151" cy="88" r="6" fill="#f3efe7"/><path d="M140 0v22M140 178v22M0 100h22M258 100h22" stroke="currentColor"/></svg>`;
+        if (id === 'paper')
+          return `<svg viewBox="0 0 280 200" role="img" aria-label="Запечатанное досье"><g transform="rotate(-9 140 100)"><rect x="56" y="32" width="168" height="134" fill="#f4eddc" stroke="#302b27" stroke-width="2"/><path d="M56 32l84 72 84-72M56 166l64-65M224 166l-64-65" fill="none" stroke="#302b27" stroke-width="2"/><circle cx="140" cy="104" r="26" fill="#a53625"/><path d="M126 104h28M140 90v28" stroke="#f4eddc" stroke-width="2"/></g></svg>`;
+        return `<svg viewBox="0 0 280 200" role="img" aria-label="Две маски и один подозрительный взгляд"><g transform="rotate(-12 140 100)"><rect x="28" y="35" width="140" height="130" rx="48" fill="#5739bf"/><rect x="122" y="50" width="130" height="130" rx="48" fill="#f6eb75"/><ellipse cx="163" cy="110" rx="13" ry="23" fill="#2a2054"/><ellipse cx="207" cy="110" rx="13" ry="23" fill="#2a2054"/><path d="M68 90h58M74 119q24 25 45 0" fill="none" stroke="#fff6d9" stroke-width="9"/></g></svg>`;
+      }
+      for (const c of concepts) {
+        const s = document.createElement('section');
+        s.id = c.id;
+        s.className = c.id;
+        s.innerHTML = `<span class="selected">${c.tag}</span><h2>0${concepts.indexOf(c) + 1} / ${c.name}</h2><p class="description">${c.desc}</p><div class="screens">
+ <div class="specimen"><article class="phone"><div class="top"><b>ВЕЧЕРО</b><span>ОДИН ТЕЛЕФОН</span></div><h3>${c.heading}</h3><p class="subtitle">Соберите компанию.<br>Остальное — за нами.</p><div class="game"><div class="eyebrow">ДЕДУКЦИЯ / 01</div><div class="art">${art(c.id)}</div><h4>Шпион</h4><p>Все знают место.<br>Один делает вид.</p><div class="meta"><span class="pill">4–12 игроков</span><span class="pill">от 5 минут</span></div><button class="cta" data-go="${c.id}-role">Как играть ↗</button></div></article><p class="caption">01 · Каталог / адаптивный эскиз</p></div>
+ <div class="specimen"><article class="phone" id="${c.id}-role"><div class="top"><span>ШПИОН</span><span>01 / 04</span></div><h3>Телефон<br>Александре</h3><p class="subtitle">Убедитесь, что на экран<br>смотрите только вы.</p><div class="role"><div class="symbol" aria-hidden="true">✳</div><div class="secret" aria-live="polite"><strong>Ваша роль<br>под защитой</strong><p>Откройте, когда будете готовы.</p></div></div><div class="foot"><button class="cta" data-reveal>Показать мою роль</button><p>После просмотра скройте карточку<br>и передайте телефон дальше.</p></div></article><p class="caption">02 · Передача / нажмите, чтобы открыть</p></div>
+ <div class="specimen"><article class="phone" id="${c.id}-result"><div class="top"><span>ШПИОН</span><span>ИТОГ ПАРТИИ</span></div><div class="${c.id === 'paper' ? 'stamp' : 'art result-art'}">${c.id === 'paper' ? 'ШПИОН НАЙДЕН' : '<span aria-hidden="true">✳</span>'}</div><h3>${c.result}</h3><p class="subtitle">Команда победила.<br>Вы верно вычислили шпиона.</p><dl class="result-details"><div><dt>Шпион</dt><dd>Александра</dd></div><div><dt>Локация</dt><dd>Музей</dd></div><div><dt>Ваш выбор</dt><dd>Александра</dd></div></dl><div class="foot"><button class="cta" data-go="${c.id}-role">Ещё одну партию ↗</button><p>Те же игроки. Новая интрига.</p></div></article><p class="caption">03 · Победа команды / вымышленные данные</p></div>
+ </div><p class="motion-note">${c.motion}</p>`;
+        document.querySelector('#directions').append(s);
+      }
+      function conceal(button) {
+        const role = button.closest('.phone').querySelector('.role');
+        role.classList.remove('revealed');
+        role.querySelector('.secret').innerHTML =
+          '<strong>Ваша роль<br>под защитой</strong><p>Откройте, когда будете готовы.</p>';
+        button.textContent = 'Показать мою роль';
+        button.setAttribute('aria-expanded', 'false');
+      }
+      document.querySelectorAll('[data-reveal]').forEach((button) => {
+        button.setAttribute('aria-expanded', 'false');
+        button.addEventListener('click', () => {
+          const role = button.closest('.phone').querySelector('.role');
+          if (role.classList.contains('revealed')) {
+            conceal(button);
+            return;
+          }
+          role.querySelector('.secret').innerHTML =
+            '<p>ВЫ — МИРНЫЙ ИГРОК</p><strong>Музей</strong><p>Найдите шпиона.<br>Не называйте место прямо.</p>';
+          role.classList.add('revealed');
+          button.textContent = 'Скрыть и передать';
+          button.setAttribute('aria-expanded', 'true');
+        });
+      });
+      function concealAll() {
+        document.querySelectorAll('[data-reveal]').forEach(conceal);
+      }
+      window.addEventListener('blur', concealAll);
+      document.addEventListener('visibilitychange', () => {
+        if (document.hidden) concealAll();
+      });
+      document.querySelectorAll('[data-go]').forEach((button) =>
+        button.addEventListener('click', () => {
+          concealAll();
+          const target = document.getElementById(button.dataset.go);
+          target.scrollIntoView({ behavior: 'instant', block: 'center' });
+          target.querySelector('button')?.focus({ preventScroll: true });
+        }),
+      );
+    </script>
+  </body>
+</html>

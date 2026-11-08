@@ -42,3 +42,7 @@ GoogleService-Info.plist
 **/android/.gradle/
 **/android/captures/
 **/ios/Flutter/.last_build_id
+
+# Local browser inspection artifacts; selected captures live in docs/design
+.playwright-cli/
+output/playwright/
