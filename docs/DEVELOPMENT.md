@@ -123,6 +123,39 @@ Android/iOS host-проекты сгенерированы Flutter 3.38.5. Вр�
 `flutter analyze`. Сборка Android: `flutter build apk --debug` из `apps/mobile` при
 наличии SDK/JDK. iOS: `flutter build ios --no-codesign` на macOS с Xcode.
 
+## Android APK для установки вручную
+
+Для текущего Flutter 3.38.5 нужны Android SDK Platform 36, Build Tools 35.0.0,
+NDK 28.2.13676358, CMake 3.22.1 и совместимый JDK (для этой сборки — Temurin 21).
+Задайте JAVA_HOME и ANDROID_HOME для своей установки; SDK/кеши не входят в Git.
+При конфликте Gradle file watcher в WSL можно задать
+`GRADLE_OPTS=-Dorg.gradle.vfs.watch=false` для команды сборки.
+После подготовки SDK и зависимостей:
+
+```sh
+cd apps/mobile
+flutter build apk --release
+```
+
+Для переключения с тестов/debug на release не добавляйте `--no-pub`:
+в Flutter 3.38.5 этот флаг также пропускает обновление native plugin registrant,
+из-за чего там может остаться dev-плагин integration_test без release-класса.
+GeneratedPluginRegistrant обновляется Flutter, вручную его не исправлять.
+
+Результат: `build/app/outputs/flutter-apk/app-release.apk`. Без `--split-per-abi`
+собирается один APK для всех включённых архитектур. Текущая release-конфигурация
+использует debug-подпись: это оптимизированная тестовая сборка для телефона,
+store-подпись ещё не настроена. Для обновления поверх установленной версии нужны
+тот же app ID и тот же ключ; не удаляйте локальный debug.keystore между сборками.
+Ключи в Git/каталог передачи APK не копировать. `local.properties` также игнорируется.
+
+Готовые копии APK и SHA-256 хранить в `output/android/` (не коммитятся).
+Перенести APK на телефон, открыть файловым менеджером и подтвердить установку.
+Если Android запросит разрешение для этого источника, включить его в показанном
+системном диалоге: [официальная инструкция](https://developer.android.com/studio/publish#publishing-website).
+Проверка на устройстве: [протокол PB-020](playtests/PB-020-protocol.md).
+Успешная сборка и проверка подписи не заменяют запуск и партию на телефоне.
+
 ## Git и совместная работа
 
 Основная ветка `main`; рабочие ветки `feat/pb-010-local-session`, `fix/...`, `docs/...`.

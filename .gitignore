@@ -49,3 +49,7 @@ output/playwright/
 
 # Flutter visual regression diagnostics
 apps/mobile/test/failures/
+
+# Local Android install packages
+*.apk
+output/android/
