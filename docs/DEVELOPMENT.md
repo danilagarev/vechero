@@ -75,7 +75,7 @@ widget-тест проверяет asset manifest и чтение JSON. Не с�
 Android/iOS host-проекты сгенерированы Flutter 3.38.5. Временный namespace/bundle ID
 начинается с `dev.partybox.prototype`; перед store-сборками заменить осознанно и
 проверить deep links, подпись и developer accounts. Отображаемое название —
-PartyBox; иконки пока шаблонные. Release-подпись ещё не настроена.
+Вечеро (временное название); иконки пока шаблонные. Release-подпись ещё не настроена.
 
 Изменения native-файлов проверяются настоящей сборкой нужной платформы, а не только
 `flutter analyze`. Сборка Android: `flutter build apk --debug` из `apps/mobile` при
@@ -89,7 +89,7 @@ PartyBox; иконки пока шаблонные. Release-подпись ещ�
 Для длительной работы — [шаблон плана](plans/TEMPLATE.md); передача результата через
 `docs/STATUS.md`, а не через скрытую память конкретного агента.
 
-Remote подключается владельцем: `git remote add origin <repository-url>`.
+Remote `origin`: `https://github.com/danilagarev/vechero.git`.
 После публикации включить обязательные CI-проверки `node` и `flutter` для `main`.
 CI не отправляет приложение в магазины. Подпись и deployment требуют отдельной настройки.
 

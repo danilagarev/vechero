@@ -5,7 +5,7 @@ class PartyBoxApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => MaterialApp(
-    title: 'PartyBox',
+    title: 'Вечеро',
     debugShowCheckedModeBanner: false,
     theme: ThemeData(
       useMaterial3: true,
@@ -35,7 +35,7 @@ class CatalogScreen extends StatelessWidget {
             padding: const EdgeInsets.all(24),
             children: [
               const SizedBox(height: 16),
-              Text('PARTYBOX', style: Theme.of(context).textTheme.labelLarge),
+              Text('ВЕЧЕРО', style: Theme.of(context).textTheme.labelLarge),
               const SizedBox(height: 40),
               Text(
                 'Собрались?\nДавайте играть.',
