@@ -7,9 +7,11 @@ import 'design/night_components.dart';
 import 'design/night_gallery.dart';
 import 'design/night_theme.dart';
 import 'spy/spy_game_screen.dart';
+import 'storage/spy_setup.dart';
 
 class PartyBoxApp extends StatelessWidget {
-  const PartyBoxApp({super.key});
+  const PartyBoxApp({super.key, this.setupStore});
+  final SpySetupStore? setupStore;
 
   @override
   Widget build(BuildContext context) => MaterialApp(
@@ -21,12 +23,13 @@ class PartyBoxApp extends StatelessWidget {
     theme: nightTheme(),
     home: const bool.fromEnvironment('DESIGN_GALLERY') && !kReleaseMode
         ? const NightGallery()
-        : const CatalogScreen(),
+        : CatalogScreen(setupStore: setupStore),
   );
 }
 
 class CatalogScreen extends StatelessWidget {
-  const CatalogScreen({super.key});
+  const CatalogScreen({super.key, this.setupStore});
+  final SpySetupStore? setupStore;
 
   @override
   Widget build(BuildContext context) => Scaffold(
@@ -98,7 +101,10 @@ class CatalogScreen extends StatelessWidget {
                       dark: true,
                       label: 'Как играть',
                       onPressed: () => Navigator.of(context).push<void>(
-                        NightRoute(builder: (_) => const SpyRulesScreen()),
+                        NightRoute(
+                          builder: (_) =>
+                              SpyRulesScreen(setupStore: setupStore),
+                        ),
                       ),
                     ),
                   ],
@@ -119,7 +125,8 @@ class CatalogScreen extends StatelessWidget {
 }
 
 class SpyRulesScreen extends StatelessWidget {
-  const SpyRulesScreen({super.key});
+  const SpyRulesScreen({super.key, this.setupStore});
+  final SpySetupStore? setupStore;
 
   @override
   Widget build(BuildContext context) => Scaffold(
@@ -161,9 +168,11 @@ class SpyRulesScreen extends StatelessWidget {
               const SizedBox(height: 24),
               NightButton(
                 label: 'Собрать компанию',
-                onPressed: () => Navigator.of(
-                  context,
-                ).push<void>(NightRoute(builder: (_) => const SpyGameScreen())),
+                onPressed: () => Navigator.of(context).push<void>(
+                  NightRoute(
+                    builder: (_) => SpyGameScreen(setupStore: setupStore),
+                  ),
+                ),
               ),
             ],
           ),

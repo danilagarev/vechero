@@ -11,13 +11,21 @@ import '../design/night_result_art.dart';
 
 import 'local_session_adapter.dart';
 import 'spy_controller.dart';
+import '../storage/spy_setup.dart';
 
 class SpyGameScreen extends StatefulWidget {
-  const SpyGameScreen({super.key, this.adapter, this.now, this.loadPack});
+  const SpyGameScreen({
+    super.key,
+    this.adapter,
+    this.now,
+    this.loadPack,
+    this.setupStore,
+  });
 
   final LocalSessionAdapter? adapter;
   final DateTime Function()? now;
   final Future<SpyPack> Function()? loadPack;
+  final SpySetupStore? setupStore;
 
   @override
   State<SpyGameScreen> createState() => _SpyGameScreenState();
@@ -36,6 +44,10 @@ class _SpyGameScreenState extends State<SpyGameScreen>
   bool _settings = false;
   bool _allowExit = false;
   bool _exitPending = false;
+  bool _saving = false;
+  bool _clearing = false;
+  String? _setupNotice;
+  int _setupRevision = 0;
   int _count = 4;
   int _minutes = 5;
   String? _suspectId;
@@ -60,6 +72,7 @@ class _SpyGameScreenState extends State<SpyGameScreen>
       final adapter =
           widget.adapter ??
           LocalSessionAdapter(pack: await (widget.loadPack ?? SpyPack.load)());
+      await _restoreSetup(adapter.pack.id);
       if (!mounted) return;
       final controller = SpyController(adapter: adapter, now: widget.now);
       controller.setForeground(
@@ -75,6 +88,94 @@ class _SpyGameScreenState extends State<SpyGameScreen>
       if (mounted) setState(() => _loadFailed = true);
     } finally {
       _loading = false;
+    }
+  }
+
+  Future<void> _restoreSetup(String packId) async {
+    final store = widget.setupStore;
+    if (store == null) return;
+    try {
+      final restored = await store.load();
+      if (!mounted) return;
+      switch (restored.status) {
+        case SetupRestoreStatus.empty:
+          break;
+        case SetupRestoreStatus.restored:
+          final setup = restored.setup!;
+          _count = setup.names.length;
+          _minutes = setup.discussionMinutes;
+          for (var i = 0; i < setup.names.length; i++) {
+            _names[i].text = setup.names[i];
+          }
+          _setupNotice = setup.packId == packId
+              ? 'Имена и время остались с прошлой игры. Начнём новый раунд.'
+              : 'Прежний набор недоступен. Имена и время восстановлены; используем текущий набор.';
+        case SetupRestoreStatus.invalid:
+        case SetupRestoreStatus.unsupportedVersion:
+          _setupNotice =
+              'Сохранённые настройки недоступны. Подготовьте новую партию.';
+      }
+    } catch (_) {
+      if (mounted) {
+        _setupNotice =
+            'Не удалось загрузить настройки. Можно начать новую партию.';
+      }
+    }
+  }
+
+  Future<void> _start(SpyController controller) async {
+    if (_saving || _clearing || controller.phase != null) return;
+    final setup = SpySetup(
+      names: [for (final name in _names.take(_count)) name.text],
+      discussionMinutes: _minutes,
+      packId: controller.adapter.pack.id,
+    );
+    setState(() => _saving = true);
+    var saved = true;
+    try {
+      await widget.setupStore?.save(setup);
+    } catch (_) {
+      saved = false;
+    }
+    if (!mounted) return;
+    setState(() => _saving = false);
+    controller.start(setup.names, Duration(minutes: setup.discussionMinutes));
+    if (!saved) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            'Игра началась, но настройки не сохранились. После закрытия их нужно ввести заново.',
+          ),
+        ),
+      );
+    }
+  }
+
+  Future<void> _clearSetup() async {
+    if (_clearing || _saving) return;
+    setState(() => _clearing = true);
+    try {
+      await widget.setupStore!.clear();
+      if (!mounted) return;
+      for (final name in _names) {
+        name.clear();
+      }
+      setState(() {
+        _count = 4;
+        _setupRevision++;
+        _minutes = 5;
+        _settings = false;
+        _setupNotice = 'Сохранённые настройки удалены.';
+      });
+    } catch (_) {
+      if (mounted) {
+        setState(
+          () => _setupNotice =
+              'Не удалось удалить настройки. Попробуйте ещё раз.',
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _clearing = false);
     }
   }
 
@@ -170,6 +271,7 @@ class _SpyGameScreenState extends State<SpyGameScreen>
                 _controller?.phase,
                 _settings,
                 _controller?.currentPlayer?.id,
+                _setupRevision,
               )),
               padding: const EdgeInsets.all(24),
               children: [
@@ -220,7 +322,13 @@ class _SpyGameScreenState extends State<SpyGameScreen>
     }
     switch (controller.phase) {
       case null:
-        return _settings ? _settingsContent(controller) : _playersContent();
+        return [
+          if (_setupNotice != null) ...[
+            NightPanel(child: Text(_setupNotice!)),
+            const SizedBox(height: 20),
+          ],
+          ...(_settings ? _settingsContent(controller) : _playersContent()),
+        ];
       case SpyPhase.distribution:
         final player = controller.currentPlayer!;
         final card = controller.visibleCard;
@@ -523,7 +631,7 @@ class _SpyGameScreenState extends State<SpyGameScreen>
         for (var count = 4; count <= 12; count++)
           DropdownMenuItem(value: count, child: Text('$count')),
       ],
-      onChanged: (value) => setState(() => _count = value!),
+      onChanged: _clearing ? null : (value) => setState(() => _count = value!),
     ),
     const SizedBox(height: 16),
     Form(
@@ -536,6 +644,7 @@ class _SpyGameScreenState extends State<SpyGameScreen>
               child: TextFormField(
                 key: ValueKey('player-name-$i'),
                 controller: _names[i],
+                enabled: !_clearing,
                 decoration: InputDecoration(labelText: 'Игрок ${i + 1}'),
                 textCapitalization: TextCapitalization.words,
                 textInputAction: i == _count - 1
@@ -550,13 +659,22 @@ class _SpyGameScreenState extends State<SpyGameScreen>
       ),
     ),
     NightButton(
-      onPressed: () {
-        if (!_formKey.currentState!.validate()) return;
-        FocusManager.instance.primaryFocus?.unfocus();
-        setState(() => _settings = true);
-      },
+      onPressed: _clearing
+          ? null
+          : () {
+              if (!_formKey.currentState!.validate()) return;
+              FocusManager.instance.primaryFocus?.unfocus();
+              setState(() => _settings = true);
+            },
       label: 'К настройкам',
     ),
+    if (widget.setupStore != null)
+      TextButton(
+        onPressed: _clearing ? null : _clearSetup,
+        child: Text(
+          _clearing ? 'Удаляем настройки…' : 'Очистить сохранённые данные',
+        ),
+      ),
     TextButton(onPressed: _exit, child: const Text('Отменить подготовку')),
   ];
 
@@ -592,19 +710,24 @@ class _SpyGameScreenState extends State<SpyGameScreen>
         for (var minutes = 3; minutes <= 15; minutes++)
           DropdownMenuItem(value: minutes, child: Text('$minutes')),
       ],
-      onChanged: (value) => setState(() => _minutes = value!),
+      onChanged: _saving ? null : (value) => setState(() => _minutes = value!),
     ),
     const SizedBox(height: 24),
     Text('Игроков: $_count · один шпион'),
+    if (widget.setupStore != null) ...[
+      const SizedBox(height: 12),
+      const Text(
+        'При старте сохраним имена и время. После закрытия приложения начните новый раунд.',
+        style: TextStyle(color: NightColors.muted),
+      ),
+    ],
     const SizedBox(height: 24),
     NightButton(
-      onPressed: () => controller.start([
-        for (final name in _names.take(_count)) name.text,
-      ], Duration(minutes: _minutes)),
-      label: 'Раздать роли',
+      onPressed: _saving ? null : () => _start(controller),
+      label: _saving ? 'Готовим партию…' : 'Раздать роли',
     ),
     TextButton(
-      onPressed: () => setState(() => _settings = false),
+      onPressed: _saving ? null : () => setState(() => _settings = false),
       child: const Text('Изменить имена'),
     ),
     TextButton(onPressed: _exit, child: const Text('Отменить подготовку')),

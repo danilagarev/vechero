@@ -1,0 +1,7 @@
+{
+  "schemaVersion": 1,
+  "gameId": "spy",
+  "names": ["Анна", "Борис", "Вера", "Глеб"],
+  "discussionMinutes": 7,
+  "packId": "spy-ru-base"
+}

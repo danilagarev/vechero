@@ -9,11 +9,13 @@ dependencies:
     sdk: flutter
   flutter_localizations:
     sdk: flutter
+  shared_preferences: 2.5.5
   partybox_game_core:
     path: ../../packages/game_core
   partybox_game_content:
     path: ../../packages/game-content
 dev_dependencies:
+  shared_preferences_platform_interface: 2.4.2
   flutter_test:
     sdk: flutter
   integration_test:
