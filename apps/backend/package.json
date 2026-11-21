@@ -12,7 +12,7 @@
     "migrate": "npm run build && node dist/src/rooms/migrate-main.js"
   },
   "dependencies": {
-    "@nestjs/common": "12.4.0",
+    "@nestjs/common": "12.5.1",
     "@nestjs/core": "12.4.0",
     "@nestjs/platform-express": "12.4.0",
     "@partybox/game-contracts": "0.1.0",
